@@ -63,25 +63,7 @@ async function showCart() {
         totalPriceElement.innerText = totalArticlesPrice
     }
 
-    // Suppression des articles dans le DOM et également du localStorage
-    const deleteButtons = document.querySelectorAll('.deleteItem')
-    deleteButtons.forEach(deleteButton => {
-    deleteButton.addEventListener('click', (event) => {
-        const articleToDelete = event.target.closest('.cart__item')
-        articleToDelete.remove()
 
-        const products = JSON.parse(localStorage.getItem('products'))
-        // Trouver l'index de l'article dans la liste de produits dans le localStorage
-        const articleIndex = products.findIndex(product => product.id === articleToDelete.dataset.id && product.selectColor === articleToDelete.dataset.selectColor)
-        // Supprimer de cette liste avec .splice, 1er arguement l'index du produit, 2nd argument combien d'élément je supprime
-        products.splice(articleIndex, 1)
-        // Mettre a jour le localStorage avec la nouvelle liste
-        localStorage.setItem('products', JSON.stringify(products))
-
-        totalPriceElement.innerText = ""
-        totalQuantity.innerText = ""
-    })
-})
 // Ajouter un écouteur d'événement input sur tous les éléments .itemQuantity
     const itemQuantityInputs = document.querySelectorAll('.itemQuantity')
     itemQuantityInputs.forEach(input => {
@@ -107,6 +89,36 @@ async function showCart() {
         totalPriceElement.innerText = totalArticlesPrice
     })
  })
+     // Suppression des articles dans le DOM et également du localStorage
+     const deleteButtons = document.querySelectorAll('.deleteItem')
+     deleteButtons.forEach(deleteButton => {
+     deleteButton.addEventListener('click', (event) => {
+         const articleToDelete = event.target.closest('.cart__item')
+         const productId = event.target.dataset.id
+         const productColor = event.target.dataset.color
+         articleToDelete.remove()
+ 
+         const products = JSON.parse(localStorage.getItem('products'))
+
+         const product = products.find(p => p.id === productId && p.selectColor === productColor)
+         const productQuantity = product.inputQuantity
+         const productPrice = priceElement.price
+         const totalPriceToRemove = productPrice * productQuantity
+
+         // Trouver l'index de l'article dans la liste de produits dans le localStorage
+
+         const articleIndex = products.findIndex(product => product.id === articleToDelete.dataset.id && product.selectColor === articleToDelete.dataset.selectColor)
+         
+         // Supprimer de cette liste avec .splice, 1er arguement l'index du produit, 2nd argument combien d'élément je supprime
+         products.splice(articleIndex, 1)
+         // Mettre a jour le localStorage avec la nouvelle liste
+         localStorage.setItem('products', JSON.stringify(products))
+
+         totalQuantity.innerText -= productQuantity
+         totalPriceElement.innerText -= totalPriceToRemove
+     })
+ })
+
 }
 
 
